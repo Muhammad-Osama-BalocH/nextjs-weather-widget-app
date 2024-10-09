@@ -164,8 +164,6 @@
 
 
 
-
-
 "use client";
 
 import { useState, FormEvent } from "react";
@@ -209,20 +207,24 @@ export default function WeatherWidget() {
       );
 
       if (!response.ok) {
-        throw new Error("City not found.");
+        const errorData = await response.json();
+        throw new Error(errorData.error.message || "City not found.");
       }
 
       const data = await response.json();
+      console.log(data); // Debugging: Log the API response to check structure
+
+      // Extracting relevant data from the API response
       const weatherData: WeatherData = {
-        temperature: data.current.temp_c,
+        temperature: data.current.temp_c, // Assuming temp in Celsius
         description: data.current.condition.text,
         location: data.location.name,
-        unit: "C",
+        unit: "C", // Fixed to Celsius
       };
 
       setWeather(weatherData);
-    } catch {
-      setError("City not found. Please try again.");
+    } catch (err: any) {
+      setError(err.message || "City not found. Please try again.");
       setWeather(null);
     } finally {
       setIsLoading(false);
@@ -250,7 +252,7 @@ export default function WeatherWidget() {
 
   // Function to get weather description message
   function getWeatherMessage(description: string): string {
-    switch (description.toLocaleLowerCase()) {
+    switch (description.toLowerCase()) {
       case "sunny":
         return "It's a beautiful sunny day!";
       case "partly cloudy":
