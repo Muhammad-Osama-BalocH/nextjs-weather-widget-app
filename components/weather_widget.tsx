@@ -155,15 +155,6 @@
 // }
 
 
-
-
-
-
-
-
-
-
-
 "use client";
 
 import { useState, FormEvent } from "react";
@@ -223,8 +214,13 @@ export default function WeatherWidget() {
       };
 
       setWeather(weatherData);
-    } catch (err: any) {
-      setError(err.message || "City not found. Please try again.");
+    } catch (err: unknown) {
+      // Safely handle the error by checking its type
+      if (err instanceof Error) {
+        setError(err.message || "City not found. Please try again.");
+      } else {
+        setError("An unknown error occurred.");
+      }
       setWeather(null);
     } finally {
       setIsLoading(false);
